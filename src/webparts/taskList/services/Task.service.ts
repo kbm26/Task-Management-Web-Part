@@ -32,10 +32,9 @@ export const getUserIdsByEmail = async (userEmails: string[]): Promise<{ id: num
     return ids
 }
 
-export const editTask = async (existingItemId: number, title: string, description: string, priority: string, dueDate: Date, userIds: { id: number, stringId: string }[]): Promise<void> => {
+export const editTask = async (existingItemId: number, title: string, priority: string, dueDate: Date, userIds: { id: number, stringId: string }[]): Promise<void> => {
     await sp.web.lists.getByTitle("Todo Tasks").items.getById(existingItemId).update({
         Title: title,
-        Description: description,
         Priority: priority,
         DueDate: dueDate.toISOString(),
         Completed: false,
@@ -44,10 +43,9 @@ export const editTask = async (existingItemId: number, title: string, descriptio
     });
 }
 
-export const addNewTask = async (title: string, description: string, priority: string, dueDate: Date, userIds: { id: number, stringId: string }[]): Promise<IItemAddResult> => {
+export const addNewTask = async (title: string, priority: string, dueDate: Date, userIds: { id: number, stringId: string }[]): Promise<IItemAddResult> => {
     return await sp.web.lists.getByTitle("Todo Tasks").items.add({
     Title: title,
-    Description: description,
     Priority: priority,
     DueDate: dueDate.toISOString(),
     Completed: false,
@@ -82,7 +80,6 @@ export const formatTaskList = async(items: any[]): Promise<ITaskState[]> => {
         return {
             TaskId: item.Id,
             Title: item.Title,
-            Description: item.Description,
             Priority: item.Priority,
             DueDate: item.DueDate,
             Completed: item.Completed,

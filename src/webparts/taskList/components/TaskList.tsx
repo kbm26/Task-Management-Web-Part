@@ -12,7 +12,6 @@ import { deleteTask, formatTaskList, getCurrentUser, getCurrentUserGroups, getIt
 export interface ITaskState {
   Title: string;
   Priority: string;
-  Description: string;
   DueDate: string;
   TaskId: number;
   Completed: boolean;

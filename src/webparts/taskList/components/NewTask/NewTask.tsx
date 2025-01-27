@@ -26,7 +26,6 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
   };
 
   const [title, setTitle] = React.useState<string>("");
-  const [description, setDescription] = React.useState<string>("");
   const [priority, setPriority] = React.useState<string>("Low");
   const [dueDate, setDueDate] = React.useState<Date>(new Date());
   const [completed, setCompleted] = React.useState<boolean>(false);
@@ -40,7 +39,6 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
           const assignee = await getUserById(existingItem.AssigneeId);  
           
           setTitle(existingItem.Title || "");
-          setDescription(existingItem.Description || "");
           setPriority(existingItem.Priority || "Low");
           setDueDate(existingItem.DueDate ? new Date(existingItem.DueDate) : new Date());
           setCompleted(existingItem.Completed || false);
@@ -64,20 +62,20 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
       try {
         const ids = await getUserIdsByEmail(assignees);
         if (existingItemId) {
-          await editTask(existingItemId, title, description, priority, dueDate, ids)
+          await editTask(existingItemId, title,  priority, dueDate, ids)
           setTasks((prevTasks) =>
             prevTasks.map((task) =>
               task.TaskId === existingItemId
-                ? { ...task, Title: title, Description: description, Priority: priority, DueDate: dueDate.toISOString(), Completed: completed }
+                ? { ...task, Title: title,  Priority: priority, DueDate: dueDate.toISOString(), Completed: completed }
                 : task
             )
           );
         } else {
-          const addedItem = await addNewTask(title, description, priority, dueDate, ids);
+          const addedItem = await addNewTask(title,  priority, dueDate, ids);
           const user = await getUserById(ids[0].id);
           setTasks((prevTasks) => [
             ...prevTasks,
-            {TaskId: addedItem.data.Id, Title: title, Description: description, Priority: priority, DueDate: dueDate.toISOString(), Completed: completed, User: user },
+            {TaskId: addedItem.data.Id, Title: title, Priority: priority, DueDate: dueDate.toISOString(), Completed: completed, User: user },
           ]);
         }
         closeForm();
@@ -95,11 +93,6 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
         placeholder="Title"
         value={title}
         onChange={(_e, newValue) => setTitle(newValue || "")}
-      />
-      <TextField
-        placeholder="Description"
-        value={description}
-        onChange={(_e, newValue) => setDescription(newValue || "")}
       />
       <Dropdown
         label="Select Priority"
