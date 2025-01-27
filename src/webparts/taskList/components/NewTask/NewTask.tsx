@@ -36,7 +36,7 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
       if (existingItemId) {
         try {
           const existingItem = await getExistingItem(existingItemId);
-          const assignee = await getUserById(existingItem.AssigneeId);  
+          const assignee = await getUserById(existingItem.UserId);  //change all UserId
           
           setTitle(existingItem.Title || "");
           setPriority(existingItem.Priority || "Low");
