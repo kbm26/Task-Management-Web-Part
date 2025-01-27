@@ -34,8 +34,8 @@ const TaskList = (props: ITaskListProps): JSX.Element => {
         setAdmin(admin)
         setUser(currentUser)
         const items = admin ? 
-          await getItemsFromList("Todo Tasks") : 
-          await getItemsFromListForCurrentUser("Todo Tasks", currentUser.Id)
+          await getItemsFromList() : 
+          await getItemsFromListForCurrentUser(currentUser.Id)
         const mappedTasks = await formatTaskList(items)
         setTasks(mappedTasks);
       } catch (error) {
@@ -105,7 +105,6 @@ const TaskList = (props: ITaskListProps): JSX.Element => {
           </>
         )}
       </>
-
     </>
   );
 };
@@ -113,7 +112,5 @@ const TaskList = (props: ITaskListProps): JSX.Element => {
 export default TaskList;
 /**
  * Update emails to be more dynamic
- * Move sites
- * 
  * add changes to email.
  */

@@ -83,6 +83,7 @@ const TaskItems = (props: TaskListProps): JSX.Element => {
       onRender: (item: ITaskState) => (
         <Checkbox
           checked={item.Completed}
+          disabled={isAdmin}
           onChange={async (_, checked) => {
             setIsDialogVisible(true);
             setDialogMessage(`Are you sure you want to mark this task as ${checked ? 'completed' : 'incomplete'}?`);

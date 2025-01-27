@@ -8,7 +8,7 @@ import {
 } from "@fluentui/react";
 import { INewTaskProps } from "./INewTaskProps";
 import { IPeoplePickerContext, PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
-import { addNewTask, editTask, getEditableItem, getUserById, getUserIdsByEmail } from "../../services/Task.service";
+import { addNewTask, editTask, getExistingItem, getUserById, getUserIdsByEmail } from "../../services/Task.service";
 
 
 const NewTask = (props: INewTaskProps): JSX.Element => {
@@ -35,7 +35,7 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
     const fetchExistingItem = async (): Promise<void> => {
       if (existingItemId) {
         try {
-          const existingItem = await getEditableItem(existingItemId);
+          const existingItem = await getExistingItem(existingItemId);
           const assignee = await getUserById(existingItem.AssigneeId);  
           
           setTitle(existingItem.Title || "");

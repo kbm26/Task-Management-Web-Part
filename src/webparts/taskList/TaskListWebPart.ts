@@ -11,6 +11,7 @@ import { sp } from "@pnp/sp";
 import * as strings from 'TaskListWebPartStrings';
 import TaskList from './components/TaskList';
 import { ITaskListProps } from './components/ITaskListProps';
+import { createTaskList, listExists } from './services/Task.service';
 
 export interface ITaskListWebPartProps {
   description: string;
@@ -37,10 +38,17 @@ export default class TaskListWebPart extends BaseClientSideWebPart<ITaskListWebP
     ReactDom.render(element, this.domElement);
   }
 
-  protected onInit(): Promise<void> {
+  protected async onInit(): Promise<void> {
     sp.setup({
       spfxContext: this.context as any,
     })
+
+    const exists = await listExists()
+    if (exists) {
+        console.log("My List was created!");
+    } else {
+      await createTaskList()
+    }
     return this._getEnvironmentMessage().then(message => {
       this._environmentMessage = message;
     });
