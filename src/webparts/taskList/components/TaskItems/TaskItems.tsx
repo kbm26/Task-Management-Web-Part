@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ITaskState } from '../TaskList';
-import { Checkbox, ContextualMenu, DefaultButton, DetailsList, Dialog, DialogFooter, DialogType, IColumn, IContextualMenuItem, PrimaryButton } from '@fluentui/react';
+import { Checkbox, ContextualMenu, DefaultButton, DetailsList, Dialog, DialogFooter, DialogType, DirectionalHint, IColumn, IContextualMenuItem, PrimaryButton } from '@fluentui/react';
 import { formatDate } from '../../services/Task.service';
 
 interface TaskListProps {
@@ -164,6 +164,7 @@ const TaskItems = (props: TaskListProps): JSX.Element => {
         <ContextualMenu
           items={menuItems}
           target={menuTarget}
+          directionalHint={DirectionalHint.bottomLeftEdge}
           onDismiss={() => {
             setIsMenuVisible(false);
           }}
