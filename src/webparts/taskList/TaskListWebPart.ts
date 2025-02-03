@@ -44,9 +44,7 @@ export default class TaskListWebPart extends BaseClientSideWebPart<ITaskListWebP
     })
 
     const exists = await listExists()
-    if (exists) {
-        console.log("My List was created!");
-    } else {
+    if (!exists) {
       await createTaskList()
     }
     return this._getEnvironmentMessage().then(message => {

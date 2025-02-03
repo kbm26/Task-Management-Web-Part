@@ -74,5 +74,4 @@ This extension illustrates the following concepts:
 
 Clean up the read me
 Test
-Add emails for people to use
 Clean up email templates

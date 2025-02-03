@@ -60,7 +60,6 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
       return;
     } else {
       try {
-        console.log(assignees, ' Assignees')
         const ids = await getAssigneeIdsByEmail(assignees);
         if (existingItemId) {
           await editTask(existingItemId, title,  priority, dueDate, ids)
@@ -72,8 +71,6 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
             )
           );
         } else {
-          console.log({title,  priority, dueDate, ids}, 'new task')
-
           const addedItem = await addNewTask(title,  priority, dueDate, ids);
           const user = await getUserById(ids[0].id);
           setTasks((prevTasks) => [
@@ -117,7 +114,7 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
           showtooltip={true}
           required={true}
           personSelectionLimit={1}
-          onChange={(items) => setAssignees(items.map(item => {console.log(item);return item.secondaryText!}))}
+          onChange={(items) => setAssignees(items.map(item => item.secondaryText!))}
           principalTypes={[PrincipalType.User, PrincipalType.SharePointGroup]}
           defaultSelectedUsers={assignees}
         />

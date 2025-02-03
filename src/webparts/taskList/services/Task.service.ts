@@ -4,7 +4,7 @@ import { ISiteGroupInfo } from "@pnp/sp/site-groups";
 import { ISiteUserInfo } from "@pnp/sp/site-users/types";
 import { ITaskState } from "../components/TaskList";
 
-const LISTNAME = "Task List"
+const LISTNAME = "Tasks"
 
 export const getListByTitle = async (): Promise<IList> => {
     return sp.web.lists.getByTitle(LISTNAME);
@@ -13,19 +13,17 @@ export const getListByTitle = async (): Promise<IList> => {
 export const listExists = async (): Promise<boolean> => {
     const exists = await getListByTitle()
     try {
-        console.log((await exists.get()))
+        await exists.get()
         return true
     } catch (error) {
-        console.log(error)
         return false
     }
 }
 
 export const createTaskList = async (): Promise<void> => {
     const { list } = await sp.web.lists.add(LISTNAME, "Tasks", 100, true, {
-        Hidden: true,
+        Hidden: false,
     });
-    console.log(list)
 
     await list.fields.addChoice("Priority", ["High", "Medium", "Low"]);
     await list.fields.addDateTime("DueDate");
@@ -54,8 +52,6 @@ export const getUserById = async (userId: number): Promise<ISiteUserInfo> => {
 }
 
 export const getAssigneeIdsByEmail = async (assigneeEmails: string[]): Promise<{ id: number, stringId: string }[]> => {
-    const users = await sp.web.siteUsers();
-    console.log(users, 'uisers')
     const ids: { id: number, stringId: string }[] = []
     for (const assignee of assigneeEmails) {
         const assigneeObject = await sp.web.siteUsers.getByEmail(assignee)();
