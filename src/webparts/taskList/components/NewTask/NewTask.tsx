@@ -8,7 +8,7 @@ import {
 } from "@fluentui/react";
 import { INewTaskProps } from "./INewTaskProps";
 import { IPeoplePickerContext, PeoplePicker, PrincipalType } from "@pnp/spfx-controls-react/lib/PeoplePicker";
-import { addNewTask, editTask, getExistingItem, getUserById, getUserIdsByEmail } from "../../services/Task.service";
+import { addNewTask, editTask, getExistingTask, getUserById, getAssigneeIdsByEmail } from "../../services/Task.service";
 
 
 const NewTask = (props: INewTaskProps): JSX.Element => {
@@ -35,8 +35,8 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
     const fetchExistingItem = async (): Promise<void> => {
       if (existingItemId) {
         try {
-          const existingItem = await getExistingItem(existingItemId);
-          const assignee = await getUserById(existingItem.UserId);  //change all UserId
+          const existingItem = await getExistingTask(existingItemId);
+          const assignee = await getUserById(existingItem.AssigneeId);
           
           setTitle(existingItem.Title || "");
           setPriority(existingItem.Priority || "Low");
@@ -60,7 +60,8 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
       return;
     } else {
       try {
-        const ids = await getUserIdsByEmail(assignees);
+        console.log(assignees, ' Assignees')
+        const ids = await getAssigneeIdsByEmail(assignees);
         if (existingItemId) {
           await editTask(existingItemId, title,  priority, dueDate, ids)
           setTasks((prevTasks) =>
@@ -71,11 +72,13 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
             )
           );
         } else {
+          console.log({title,  priority, dueDate, ids}, 'new task')
+
           const addedItem = await addNewTask(title,  priority, dueDate, ids);
           const user = await getUserById(ids[0].id);
           setTasks((prevTasks) => [
             ...prevTasks,
-            {TaskId: addedItem.data.Id, Title: title, Priority: priority, DueDate: dueDate.toISOString(), Completed: completed, User: user },
+            {TaskId: addedItem.data.Id, Title: title, Priority: priority, DueDate: dueDate.toISOString(), Completed: completed, Assignee: user },
           ]);
         }
         closeForm();
@@ -114,7 +117,7 @@ const NewTask = (props: INewTaskProps): JSX.Element => {
           showtooltip={true}
           required={true}
           personSelectionLimit={1}
-          onChange={(items) => setAssignees(items.map(item => item.secondaryText!))}
+          onChange={(items) => setAssignees(items.map(item => {console.log(item);return item.secondaryText!}))}
           principalTypes={[PrincipalType.User, PrincipalType.SharePointGroup]}
           defaultSelectedUsers={assignees}
         />

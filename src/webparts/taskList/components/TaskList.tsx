@@ -15,7 +15,7 @@ export interface ITaskState {
   DueDate: string;
   TaskId: number;
   Completed: boolean;
-  User: ISiteUserInfo;
+  Assignee: ISiteUserInfo;
 }
 
 const TaskList = (props: ITaskListProps): JSX.Element => {

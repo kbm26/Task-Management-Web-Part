@@ -4,11 +4,10 @@ import { ISiteGroupInfo } from "@pnp/sp/site-groups";
 import { ISiteUserInfo } from "@pnp/sp/site-users/types";
 import { ITaskState } from "../components/TaskList";
 
+const LISTNAME = "Task List"
 
 export const getListByTitle = async (): Promise<IList> => {
-    const bb = await sp.web.lists.getByTitle("Test Tasks").fields()
-    console.log(bb)
-    return sp.web.lists.getByTitle("Test Tasks");
+    return sp.web.lists.getByTitle(LISTNAME);
 }
 
 export const listExists = async (): Promise<boolean> => {
@@ -23,7 +22,7 @@ export const listExists = async (): Promise<boolean> => {
 }
 
 export const createTaskList = async (): Promise<void> => {
-    const { list } = await sp.web.lists.add("Test Tasks", "Tasks", 100, true, {
+    const { list } = await sp.web.lists.add(LISTNAME, "Tasks", 100, true, {
         Hidden: true,
     });
     console.log(list)
@@ -32,7 +31,7 @@ export const createTaskList = async (): Promise<void> => {
     await list.fields.addDateTime("DueDate");
     await list.fields.addNumber("TaskId");
     await list.fields.addBoolean("Completed");
-    await list.fields.addUser("User", FieldUserSelectionMode.PeopleOnly);
+    await list.fields.addUser("Assignee", FieldUserSelectionMode.PeopleOnly);
 }
 
 export const formatDate = (isoString: string): string => {
@@ -43,32 +42,36 @@ export const formatDate = (isoString: string): string => {
     return `${month}/${day}/${year}`;
 };
 
-export const getExistingItem = async (itemId: number): Promise<any> => {
+export const getExistingTask = async (taskId: number): Promise<any> => {
+
     const list = await getListByTitle();
-    const existingItem = list.items.getById(itemId)();
-    return existingItem
+    const existingTask = list.items.getById(taskId)();
+    return existingTask
 }
 
 export const getUserById = async (userId: number): Promise<ISiteUserInfo> => {
     return await sp.web.getUserById(userId)();
 }
 
-export const getUserIdsByEmail = async (userEmails: string[]): Promise<{ id: number, stringId: string }[]> => {
+export const getAssigneeIdsByEmail = async (assigneeEmails: string[]): Promise<{ id: number, stringId: string }[]> => {
+    const users = await sp.web.siteUsers();
+    console.log(users, 'uisers')
     const ids: { id: number, stringId: string }[] = []
-    for (const user of userEmails) {
-        const userObject = await sp.web.siteUsers.getByEmail(user)();
-        ids.push({ id: userObject.Id, stringId: `${userObject.Id}` })
+    for (const assignee of assigneeEmails) {
+        const assigneeObject = await sp.web.siteUsers.getByEmail(assignee)();
+        ids.push({ id: assigneeObject.Id, stringId: `${assigneeObject.Id}` })
     }
     return ids
 }
 
-export const editTask = async (existingItemId: number, title: string, priority: string, dueDate: Date, userIds: { id: number, stringId: string }[]): Promise<void> => {
-    await (await getExistingItem(existingItemId)).update({
+export const editTask = async (existingTaskId: number, title: string, priority: string, dueDate: Date, userIds: { id: number, stringId: string }[]): Promise<void> => {
+    const list = await getListByTitle();
+    await list.items.getById(existingTaskId).update({
         Title: title,
         Priority: priority,
         DueDate: dueDate.toISOString(),
         Completed: false,
-        UserId: userIds[0].id,
+        AssigneeId: userIds[0].id,
 
     });
 }
@@ -80,7 +83,7 @@ export const addNewTask = async (title: string, priority: string, dueDate: Date,
         Priority: priority,
         DueDate: dueDate.toISOString(),
         Completed: false,
-        UserId: userIds[0].id,
+        AssigneeId: userIds[0].id,
     });
 }
 
@@ -101,30 +104,31 @@ export const getItemsFromList = async (): Promise<any[]> => {
 }
 
 export const getItemsFromListForCurrentUser = async (userId: number): Promise<any[]> => {
-    return (await getListByTitle()).items.filter(`UserId eq '${userId}'`).get()
+    return (await getListByTitle()).items.filter(`AssigneeId eq '${userId}'`).get()
 }
 
-export const formatTaskList = async (items: any[]): Promise<ITaskState[]> => {
-    console.log(items)
-    return await Promise.all(items.map(async (item) => {
-        const user = await getUserById(item.UserId);
+export const formatTaskList = async (tasks: any[]): Promise<ITaskState[]> => {
+    return await Promise.all(tasks.map(async (task) => {
+        const assignee = await getUserById(task.AssigneeId);
         return {
-            TaskId: item.Id,
-            Title: item.Title,
-            Priority: item.Priority,
-            DueDate: item.DueDate,
-            Completed: item.Completed,
-            User: user,
+            TaskId: task.Id,
+            Title: task.Title,
+            Priority: task.Priority,
+            DueDate: task.DueDate,
+            Completed: task.Completed,
+            Assignee: assignee,
         }
     }))
 }
 
 export const updateTask = async (selectedTask: ITaskState): Promise<void> => {
-    await (await getExistingItem(selectedTask.TaskId)).update({
-            Completed: selectedTask.Completed,
-        });
+    const list = await getListByTitle();
+    await list.items.getById(selectedTask.TaskId).update({
+         Completed: selectedTask.Completed,
+    });
 }
 
 export const deleteTask = async (taskId: number): Promise<void> => {
-    await (await getExistingItem(taskId)).delete();
+    const list = await getListByTitle();
+    await list.items.getById(taskId).delete();
 }

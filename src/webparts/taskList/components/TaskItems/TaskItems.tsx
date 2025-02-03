@@ -98,7 +98,7 @@ const TaskItems = (props: TaskListProps): JSX.Element => {
       minWidth: 100,
       maxWidth: 150,
       onRender: (item: ITaskState) => (
-        <span>{item.User?.Title}</span>
+        <span>{item.Assignee?.Title}</span>
       ),
     },
   ];
